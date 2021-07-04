@@ -15,8 +15,6 @@ import (
 const (
 	manifestFile = "manifest.json"
 
-	artifactKeyServiceConfigs = "serviceconfigs"
-
 	serviceConfigPopulatorConfigRoot = "populate.serviceconfig"
 )
 
@@ -40,9 +38,11 @@ type ServiceConfigPopulator struct {
 	cfg ServiceConfigPopulatorConfig
 }
 
-type manifest map[string][]artifact
+type manifest struct {
+	ServiceConfigs []serviceConfigArtifact
+}
 
-type artifact struct {
+type serviceConfigArtifact struct {
 	api.ServiceConfigurationRequest
 	populate.Artifact
 }
@@ -69,7 +69,7 @@ func (p ServiceConfigPopulator) Populate(ctx context.Context) error {
 			return err
 		}
 
-		for _, serviceDefinitionArtifact := range manifest[artifactKeyServiceConfigs] {
+		for _, serviceDefinitionArtifact := range manifest.ServiceConfigs {
 			err = p.populateServiceConfig(ctx, scm, serviceDefinitionArtifact)
 			if err != nil {
 				return err
@@ -80,7 +80,7 @@ func (p ServiceConfigPopulator) Populate(ctx context.Context) error {
 	})
 }
 
-func (p ServiceConfigPopulator) populateServiceConfig(ctx context.Context, scm api.Api, artifact artifact) (err error) {
+func (p ServiceConfigPopulator) populateServiceConfig(ctx context.Context, scm api.Api, artifact serviceConfigArtifact) (err error) {
 	logger.WithContext(ctx).Infof("Populating service config %q", artifact.TemplateFileName)
 
 	var request = artifact.ServiceConfigurationRequest
