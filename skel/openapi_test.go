@@ -5,7 +5,6 @@
 package skel
 
 import (
-	. "github.com/dave/jennifer/jen"
 	"reflect"
 	"testing"
 )
